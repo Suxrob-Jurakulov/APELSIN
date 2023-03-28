@@ -1,0 +1,92 @@
+*************** Apelsin Project ***************
+***
+1. Use SpringSecurity + Jwt
+2. Log in important apis
+3. Swagger
+4. Rest all methods with postman or .http file
+
+**** Entities *****
+1. Client
+    name,surname,phone unique,password,status,created_date
+2. Card
+    name,number,exp_date, client_id,created_date
+3. Merchant
+    name,card_number,status, created_date
+4. Transaction
+    from_card_id,to_card_id,amount,created_date,uzCard_transaction_id, Type
+5. SavedTransactions
+
+*** enums ***
+    TransactionType: Transfer, Payment
+
+
+*** Code ***
+1. Login
+2. Registration
+3. Client: CRUD
+4. Card: CRUD
+    1. Add Card. Qo'shilayotgan carta uzcard_project ning bazasida bo'lishi kerak.
+      Restemplate orqali  uzcard_project murojat qilib karta infosini olamiz.
+      Agar Carta xaqiqatdan ham Client ning tel raqamida join qilingan bo'lsa,
+      Client ga Card ni qo'shishga ruxsat beramiz.
+    2. Get Card list (murojat qilgan profile ning cartalarini return qiladi)
+    3. Change card status. Kelgan card number xaqiqatdan ham
+        murojat qilgan profile ga teqishli bo'lsa uni  statusini o'zgartiradi.
+        Status o'zgartirish Apelsinda va  uzcard_project da ham bo'lishi kerak.
+        (oldin uzcard_project ga request jo'natamiz va success
+            bo'lsa Apelsinda o'zgartirib qo'yamiz.)
+    4. Get user name,surname from card number. Card should be active
+        Front(User)  Apelsinga murojat qiladi Apelsin uzcard_project ga
+         murojat qilib danniyni olib keladi va Front ga return qiladi.
+5. Merchant:
+    Merchant bu (beline,Ucel, Internet provider lar).
+    1. Create,Update,Delete  Merchant (Only admin can create )
+        (merchatn ning cartasi uzcard_project da bo'lishi kerak)
+    2. Get active Merchant list with pagination
+
+6. Transaction
+    1. Card to Card. Client Cartadan cartaga pul o'tkazishi mumkin.
+        bunda from from_card, to_card, amount larni front dan keladi.
+        Apelsin o'zi pulni transfer qila olmaydi u uzcard_project ga
+        transfer uchun murojat qiladi. uzcard_project success qaytarsa
+        Apelsin bo'ldi deb ko'rsatadi. Bunda uzcard_project Transaction id ni qaytaradi
+        va Apelsin uni O'zidagi Transaction ga save qiladi.
+            (Transaction detail, uzcard_project dan kelgan transaction_id)
+        Methodga kelgan from_card_number Request jo'natgan Client tegishli bo'lishi kerak.
+            Cartaning statusi active bo'lishi kerak.
+    2. Payment
+        Card to Merchant.
+           Frontdan card_number va Merchant id, amount keladi.
+           Bunda card_number dan merchant ning card_number ga kelgan amount ni
+            o'tkazishimiz kerak.
+           uzcard_project ga request jo'natib hammasi success bo'lsa Apelsin da Transaction
+           yaratish kerak, Ammo type Payment bo'ladi.
+           Frontdan kelgan card_number request jo'natgan userga tegishli bo'lishi kerak.
+           Mazgi birovni kartasidan pul to'lab qo'ymasin.
+
+    3. Filter Transaction List.
+        Request qilgan userning Transaction list rini filter qilib return qilish kerak.
+        Bunda barcha kirim va chiqim Transaction ni ham inobatga olish kerak.
+        Bunda quyidagi fieldlar return bo'ladi date bo'yicha order qilingan xolatda.
+        transaction_id,
+         from_card_number,
+         card_name,
+         to_card_number,
+         to_card_number ning egasini ismi.
+         amount,
+         transaction_date,
+         uzcard_transaction_id,
+         Type.
+
+       Filter quyidagi field lar bo'yicha bo'lishi kerak.
+        FilterDTO(card_number,Kirim/Chiqim/All,transaction_date,Amount)
+    4. Get  user Kirim amount for the current month
+    5. Get User Chiqim amount for the current month
+
+7. Statistic: Only For Admin
+     1. Today Transaction List
+     2. Transaction List At date
+     3. Transaction List Filter
+        FilterDTO (date_from,date_to,card_number,amount,type,client_id,phone)
+            card_number - transaction dagi from_card_number
+                yoki to_card_number ham bo'lshi mumkin.
